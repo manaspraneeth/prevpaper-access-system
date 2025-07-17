@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Previous Year Paper Portal</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #e3f2fd, #fff3e0);
+      color: #333;
+      padding: 20px;
+    }
+
+    h1, h2 {
+      color: #1976d2;
+    }
+
+    .container {
+      max-width: 700px;
+      margin: auto;
+      background: #fff;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.1);
+    }
+
+    input[type="text"], input[type="password"], input[type="file"] {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0 20px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+
+    button {
+      padding: 10px 20px;
+      background-color: #0288d1;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #0277bd;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    li {
+      background: #f1f8e9;
+      margin-bottom: 10px;
+      padding: 10px;
+      border-left: 5px solid #66bb6a;
+      border-radius: 6px;
+    }
+
+    a {
+      text-decoration: none;
+      color: #0288d1;
+      font-weight: bold;
+    }
+
+    .dashboard {
+      display: none;
+      margin-top: 20px;
+    }
+
+    .logout-btn {
+      margin-top: 20px;
+      background-color: #d32f2f;
+    }
+
+    .logout-btn:hover {
+      background-color: #b71c1c;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Previous Year Paper Portal</h1>
+    <div id="login-form">
+      <h2>Login</h2>
+      <input type="text" id="username" placeholder="Username" required />
+      <input type="password" id="password" placeholder="Password" required />
+      <button onclick="login()">Login</button>
+    </div>
+
+    <div id="admin-dashboard" class="dashboard">
+      <h2>Admin Dashboard</h2>
+      <form onsubmit="submitPaper(event)">
+        <input type="text" id="admin-paperTitle" placeholder="Enter Paper Title" required />
+        <input type="file" id="admin-paperFile" accept=".pdf,.doc,.docx" required />
+        <button type="submit">Add Paper</button>
+      </form>
+      <h3>Available Papers</h3>
+      <ul></ul>
+      <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
+
+    <div id="teacher-dashboard" class="dashboard">
+      <h2>Teacher Dashboard</h2>
+      <form onsubmit="submitPaper(event)">
+        <input type="text" id="teacher-paperTitle" placeholder="Enter Paper Title" required />
+        <input type="file" id="teacher-paperFile" accept=".pdf,.doc,.docx" required />
+        <button type="submit">Add Paper</button>
+      </form>
+      <h3>Available Papers</h3>
+      <ul></ul>
+      <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
+
+    <div id="student-dashboard" class="dashboard">
+      <h2>Student Dashboard</h2>
+      <h3>Available Papers</h3>
+      <ul></ul>
+      <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
+  </div>
+
+  <script>
+    function login() {
+      const user = document.getElementById("username").value;
+      const pass = document.getElementById("password").value;
+
+      const admins = { admin: "admin123" };
+      const teachers = { teacher1: "teach123", teacher2: "teach123", teacher3: "teach123", teacher4: "teach123", teacher5: "teach123", teacher6: "teach123" };
+      const students = {};
+      for (let i = 1; i <= 40; i++) {
+        students["student" + i] = "stud123";
+      }
+
+      if (admins[user] === pass) {
+        showDashboard("admin-dashboard");
+      } else if (teachers[user] === pass) {
+        showDashboard("teacher-dashboard");
+      } else if (students[user] === pass) {
+        showDashboard("student-dashboard");
+      } else {
+        alert("Invalid credentials!");
+      }
+    }
+
+    function showDashboard(dashboardId) {
+      document.getElementById("login-form").style.display = "none";
+      document.getElementById(dashboardId).style.display = "block";
+      loadPapers();
+    }
+
+    function logout() {
+      location.reload();
+    }
+
+    function submitPaper(event) {
+      event.preventDefault();
+      const userRole = document.getElementById("admin-dashboard").style.display === "block" ? "admin" : "teacher";
+      const title = document.getElementById(userRole + "-paperTitle").value;
+      const file = document.getElementById(userRole + "-paperFile").files[0];
+
+      const formData = new FormData();
+      formData.append("title", title);
+      formData.append("file", file);
+    
+      <form action="/upload" method="post" enctype="multipart/form-data">
+    <input type="file" name="file" />
+    <button type="submit">Upload</button>
+</form>
+
+      fetch(action="http://127.0.0.1:5000/submit" ,method="post"
+      )
+        .then((res) => res.json())
+        .then((data) => {
+          alert(data.message);
+          loadPapers();
+        })
+        .catch((err) => {
+          alert("Upload failed");
+        });
+    }
+
+    function loadPapers() {
+      fetch(action="http://127.0.0.1:5000/upload" ,method="post",enctype="multipart/form-data")
+        .then((res) => res.json())
+        .then((data) => {
+          const dashboards = ["admin-dashboard", "teacher-dashboard", "student-dashboard"];
+          dashboards.forEach((dash) => {
+            const list = document.querySelector(`#${dash} ul`);
+            list.innerHTML = "";
+            data.forEach((paper) => {
+              const li = document.createElement("li");
+              li.innerHTML = `${paper.title} <a href="http://127.0.0.1:5000/download/${paper.filename}" target="_blank">View</a>`;
+              list.appendChild(li);
+            });
+          });
+        });
+    }
+  </script>
+</body>
+</html>
